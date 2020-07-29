@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using HangmanGameAPI.Data;
 using HangmanGameAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 

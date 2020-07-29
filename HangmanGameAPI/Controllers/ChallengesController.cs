@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HangmanGameAPI.Models;
+using HangmanGameAPI.Data;
 
 namespace HangmanGameAPI.Controllers
 {

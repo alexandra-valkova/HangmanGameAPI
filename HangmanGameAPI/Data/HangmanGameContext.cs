@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using HangmanGameAPI.Models;
+using Microsoft.EntityFrameworkCore;
 
-namespace HangmanGameAPI.Models
+namespace HangmanGameAPI.Data
 {
     public class HangmanGameContext : DbContext
     {
