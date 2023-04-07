@@ -1,8 +1,8 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using HangmanGameAPI.Data;
+﻿using HangmanGameAPI.Data;
 using HangmanGameAPI.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace HangmanGameAPI.Controllers
 {
