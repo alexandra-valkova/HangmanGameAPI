@@ -2,9 +2,6 @@
 using HangmanGameAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace HangmanGameAPI.Controllers
 {
@@ -30,9 +27,9 @@ namespace HangmanGameAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Challenge>> GetChallenge(int id)
         {
-            var challenge = await _context.Challenges.FindAsync(id);
+            Challenge? challenge = await _context.Challenges.FindAsync(id);
 
-            if (challenge == null)
+            if (challenge is null)
             {
                 return NotFound();
             }
@@ -84,8 +81,9 @@ namespace HangmanGameAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Challenge>> DeleteChallenge(int id)
         {
-            var challenge = await _context.Challenges.FindAsync(id);
-            if (challenge == null)
+            Challenge? challenge = await _context.Challenges.FindAsync(id);
+
+            if (challenge is null)
             {
                 return NotFound();
             }
@@ -98,7 +96,7 @@ namespace HangmanGameAPI.Controllers
 
         private bool ChallengeExists(int id)
         {
-            return _context.Challenges.Any(e => e.GameId == id);
+            return _context.Challenges.Any(challenge => challenge.GameId == id);
         }
     }
 }

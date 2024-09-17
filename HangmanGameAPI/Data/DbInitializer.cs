@@ -1,5 +1,4 @@
 ﻿using HangmanGameAPI.Models;
-using System.Linq;
 
 namespace HangmanGameAPI.Data
 {
@@ -7,8 +6,6 @@ namespace HangmanGameAPI.Data
     {
         public static void Seed(HangmanGameContext context)
         {
-            // CHECK IF DATABASE EXISTS
-
             context.Database.EnsureCreated();
 
             if (context.Users.Any())
@@ -18,17 +15,21 @@ namespace HangmanGameAPI.Data
 
             // USERS
 
-            var users = new User[]
+            User admin = new()
             {
-                new User { Username = "admin", Email = "admin@admin.com", Password = "admin" },
-                new User { Username = "alexandra", Email = "alexandra.valkova.97@gmail.com", Password = "alexandra" }
+                Username = "admin",
+                Email = "admin@admin.com",
+                Password = "admin"
             };
 
-            foreach (User user in users)
+            User player = new()
             {
-                context.Users.Add(user);
-            }
+                Username = "alexandra",
+                Email = "alexandra.valkova.97@gmail.com",
+                Password = "alexandra"
+            };
 
+            context.AddRange(admin, player);
             context.SaveChanges();
 
             // WORDS
@@ -44,14 +45,10 @@ namespace HangmanGameAPI.Data
                                 STAGE,BITE,STAMP,DOLL,ADHESIVE,CAUSE,FLIPPANT,REPLACE,MIDDLE,AIRPORT,THROAT,
                                 BRAKE,FESTIVE,GLAMOROUS";
 
-            string[] wordsArray = wordsString.Split(',').Select(w => w.Trim()).ToArray();
+            IEnumerable<Word> words = wordsString.Split(',')
+                                                 .Select(word => new Word { Text = word.Trim() });
 
-            foreach (string w in wordsArray)
-            {
-                var word = new Word { Text = w };
-                context.Words.Add(word);
-            }
-
+            context.Words.AddRange(words);
             context.SaveChanges();
         }
     }

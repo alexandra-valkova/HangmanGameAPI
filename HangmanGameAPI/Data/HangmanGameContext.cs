@@ -5,8 +5,7 @@ namespace HangmanGameAPI.Data
 {
     public class HangmanGameContext : DbContext
     {
-        public HangmanGameContext(DbContextOptions<HangmanGameContext> options)
-            : base(options)
+        public HangmanGameContext(DbContextOptions<HangmanGameContext> options) : base(options)
         {
         }
 
@@ -22,8 +21,17 @@ namespace HangmanGameAPI.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Challenge>().HasOne(c => c.Receiver).WithMany(u => u.ReceivedChallenges).HasForeignKey(c => c.ReceiverId).OnDelete(DeleteBehavior.Restrict);
-            modelBuilder.Entity<Challenge>().HasOne(c => c.Sender).WithMany(u => u.SentChallenges).HasForeignKey(c => c.SenderId).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Challenge>()
+                        .HasOne(challenge => challenge.Receiver)
+                        .WithMany(user => user.ReceivedChallenges)
+                        .HasForeignKey(challenge => challenge.ReceiverId)
+                        .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Challenge>()
+                        .HasOne(challenge => challenge.Sender)
+                        .WithMany(user => user.SentChallenges)
+                        .HasForeignKey(challenge => challenge.SenderId)
+                        .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

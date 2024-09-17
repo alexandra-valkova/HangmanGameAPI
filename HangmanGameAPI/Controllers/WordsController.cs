@@ -2,9 +2,6 @@
 using HangmanGameAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace HangmanGameAPI.Controllers
 {
@@ -30,9 +27,9 @@ namespace HangmanGameAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Word>> GetWord(int id)
         {
-            var word = await _context.Words.FindAsync(id);
+            Word? word = await _context.Words.FindAsync(id);
 
-            if (word == null)
+            if (word is null)
             {
                 return NotFound();
             }
@@ -84,8 +81,9 @@ namespace HangmanGameAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Word>> DeleteWord(int id)
         {
-            var word = await _context.Words.FindAsync(id);
-            if (word == null)
+            Word? word = await _context.Words.FindAsync(id);
+
+            if (word is null)
             {
                 return NotFound();
             }
@@ -98,7 +96,7 @@ namespace HangmanGameAPI.Controllers
 
         private bool WordExists(int id)
         {
-            return _context.Words.Any(e => e.Id == id);
+            return _context.Words.Any(word => word.Id == id);
         }
     }
 }

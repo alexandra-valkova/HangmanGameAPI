@@ -1,8 +1,6 @@
 ﻿using HangmanGameAPI.Data;
 using HangmanGameAPI.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace HangmanGameAPI.Controllers
 {
@@ -19,16 +17,17 @@ namespace HangmanGameAPI.Controllers
 
         // GET: api/Login?username=&password=
         [HttpGet]
-        public async Task<ActionResult<User>> Login(string username, string password)
+        public ActionResult<User> Login(string username, string password)
         {
-            User user = _context.Users.Where(u => u.Username == username && u.Password == password).FirstOrDefault();
+            User? user = _context.Users.Where(user => user.Username == username && user.Password == password)
+                                       .FirstOrDefault();
 
-            if (user != null)
+            if (user is null)
             {
-                return user;
+                return NotFound();
             }
 
-            return NotFound();
+            return user;
         }
     }
 }
