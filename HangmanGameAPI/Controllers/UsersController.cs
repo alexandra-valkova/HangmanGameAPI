@@ -1,12 +1,12 @@
-﻿using HangmanGameAPI.Data;
-using HangmanGameAPI.Models;
+﻿using HangmanGameAPI.Entities;
+using HangmanGameAPI.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace HangmanGameAPI.Controllers
 {
-    [Route("api/User")]
     [ApiController]
+    [Route("[controller]")]
     public class UsersController : ControllerBase
     {
         private readonly HangmanGameContext _context;
@@ -16,15 +16,13 @@ namespace HangmanGameAPI.Controllers
             _context = context;
         }
 
-        // GET: api/Users
-        [HttpGet]
+        [HttpGet(Name = nameof(GetUsers))]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
             return await _context.Users.ToListAsync();
         }
 
-        // GET: api/Users/5
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}", Name = nameof(GetUser))]
         public async Task<ActionResult<User>> GetUser(int id)
         {
             User? user = await _context.Users.FindAsync(id);
@@ -37,9 +35,17 @@ namespace HangmanGameAPI.Controllers
             return user;
         }
 
-        // PUT: api/Users/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(int id, User user)
+        [HttpPost(Name = nameof(CreateUser))]
+        public async Task<ActionResult<User>> CreateUser(User user)
+        {
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
+        }
+
+        [HttpPut("{id:int}", Name = nameof(UpdateUser))]
+        public async Task<IActionResult> UpdateUser(int id, User user)
         {
             if (id != user.Id)
             {
@@ -67,18 +73,7 @@ namespace HangmanGameAPI.Controllers
             return NoContent();
         }
 
-        // POST: api/Users
-        [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
-        {
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetUser", new { id = user.Id }, user);
-        }
-
-        // DELETE: api/Users/5
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}", Name = nameof(DeleteUser))]
         public async Task<ActionResult<User>> DeleteUser(int id)
         {
             User? user = await _context.Users.FindAsync(id);

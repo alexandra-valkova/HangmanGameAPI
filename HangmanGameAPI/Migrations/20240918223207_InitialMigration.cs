@@ -1,21 +1,26 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
+
+#nullable disable
+
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
 namespace HangmanGameAPI.Migrations
 {
+    /// <inheritdoc />
     public partial class InitialMigration : Migration
     {
+        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Username = table.Column<string>(maxLength: 100, nullable: false),
-                    Email = table.Column<string>(maxLength: 100, nullable: false),
-                    Password = table.Column<string>(maxLength: 100, nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Username = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -26,9 +31,9 @@ namespace HangmanGameAPI.Migrations
                 name: "Words",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Text = table.Column<string>(maxLength: 100, nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Text = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -39,11 +44,11 @@ namespace HangmanGameAPI.Migrations
                 name: "Games",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    PlayerId = table.Column<int>(nullable: false),
-                    WordId = table.Column<int>(nullable: false),
-                    Won = table.Column<bool>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PlayerId = table.Column<int>(type: "int", nullable: false),
+                    WordId = table.Column<int>(type: "int", nullable: false),
+                    IsWon = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -66,14 +71,16 @@ namespace HangmanGameAPI.Migrations
                 name: "Challenges",
                 columns: table => new
                 {
-                    GameId = table.Column<int>(nullable: false),
-                    SenderId = table.Column<int>(nullable: false),
-                    ReceiverId = table.Column<int>(nullable: false),
-                    Played = table.Column<bool>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    GameId = table.Column<int>(type: "int", nullable: false),
+                    SenderId = table.Column<int>(type: "int", nullable: false),
+                    ReceiverId = table.Column<int>(type: "int", nullable: false),
+                    IsPlayed = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Challenges", x => x.GameId);
+                    table.PrimaryKey("PK_Challenges", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Challenges_Games_GameId",
                         column: x => x.GameId,
@@ -93,6 +100,21 @@ namespace HangmanGameAPI.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
+
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "Id", "Email", "Password", "Username" },
+                values: new object[,]
+                {
+                    { 1, "alexandra@email.com", "alexandra", "alexandra" },
+                    { 2, "yanka@email.com", "yanka", "yanka" }
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Challenges_GameId",
+                table: "Challenges",
+                column: "GameId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Challenges_ReceiverId",
@@ -115,6 +137,7 @@ namespace HangmanGameAPI.Migrations
                 column: "WordId");
         }
 
+        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(

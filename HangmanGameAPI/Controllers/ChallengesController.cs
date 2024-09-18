@@ -1,12 +1,12 @@
-﻿using HangmanGameAPI.Data;
-using HangmanGameAPI.Models;
+﻿using HangmanGameAPI.Entities;
+using HangmanGameAPI.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace HangmanGameAPI.Controllers
 {
-    [Route("api/Challenge")]
     [ApiController]
+    [Route("[controller]")]
     public class ChallengesController : ControllerBase
     {
         private readonly HangmanGameContext _context;
@@ -16,15 +16,13 @@ namespace HangmanGameAPI.Controllers
             _context = context;
         }
 
-        // GET: api/Challenges
-        [HttpGet]
+        [HttpGet(Name = nameof(GetChallenges))]
         public async Task<ActionResult<IEnumerable<Challenge>>> GetChallenges()
         {
             return await _context.Challenges.ToListAsync();
         }
 
-        // GET: api/Challenges/5
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}", Name = nameof(GetChallenge))]
         public async Task<ActionResult<Challenge>> GetChallenge(int id)
         {
             Challenge? challenge = await _context.Challenges.FindAsync(id);
@@ -37,9 +35,17 @@ namespace HangmanGameAPI.Controllers
             return challenge;
         }
 
-        // PUT: api/Challenges/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutChallenge(int id, Challenge challenge)
+        [HttpPost(Name = nameof(CreateChallenge))]
+        public async Task<ActionResult<Challenge>> CreateChallenge(Challenge challenge)
+        {
+            _context.Challenges.Add(challenge);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetChallenge", new { id = challenge.GameId }, challenge);
+        }
+
+        [HttpPut("{id:int}", Name = nameof(UpdateChallenge))]
+        public async Task<IActionResult> UpdateChallenge(int id, Challenge challenge)
         {
             if (id != challenge.GameId)
             {
@@ -67,18 +73,7 @@ namespace HangmanGameAPI.Controllers
             return NoContent();
         }
 
-        // POST: api/Challenges
-        [HttpPost]
-        public async Task<ActionResult<Challenge>> PostChallenge(Challenge challenge)
-        {
-            _context.Challenges.Add(challenge);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetChallenge", new { id = challenge.GameId }, challenge);
-        }
-
-        // DELETE: api/Challenges/5
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}", Name = nameof(DeleteChallenge))]
         public async Task<ActionResult<Challenge>> DeleteChallenge(int id)
         {
             Challenge? challenge = await _context.Challenges.FindAsync(id);

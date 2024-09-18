@@ -1,36 +1,42 @@
-﻿using HangmanGameAPI.Data;
-using Microsoft.AspNetCore;
+﻿using HangmanGameAPI.Persistence;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 
-namespace HangmanGameAPI
+var builder = WebApplication.CreateBuilder();
+
+builder.Services.AddRouting(options => options.LowercaseUrls = true);
+builder.Services.AddControllers();
+
+builder.Services.AddDbContext<HangmanGameContext>(options =>
 {
-    public class Program
+    options.UseSqlServer(builder.Configuration.GetConnectionString("HangmanGameDatabase"));
+});
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
     {
-        public static void Main(string[] args)
-        {
-            var host = CreateWebHostBuilder(args).Build();
+        Version = "v1",
+        Title = "Hangman Game API",
+        Description = "Hangman mobile game."
+    });
+});
 
-            using (var scope = host.Services.CreateScope())
-            {
-                var services = scope.ServiceProvider;
+var app = builder.Build();
 
-                try
-                {
-                    var context = services.GetRequiredService<HangmanGameContext>();
-                    DbInitializer.Seed(context);
-                }
-                catch (Exception ex)
-                {
-                    var logger = services.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex, "An error occurred while seeding the database");
-                }
-            }
-
-            host.Run();
-        }
-
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>()
-                /*.UseUrls("http://*:5000")*/;
-    }
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+    });
+    app.UseDeveloperExceptionPage();
 }
+
+app.UseHttpsRedirection();
+
+app.MapControllers();
+
+app.Run();

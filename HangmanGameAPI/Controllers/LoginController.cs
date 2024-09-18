@@ -1,10 +1,10 @@
-﻿using HangmanGameAPI.Data;
-using HangmanGameAPI.Models;
+﻿using HangmanGameAPI.Entities;
+using HangmanGameAPI.Persistence;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HangmanGameAPI.Controllers
 {
-    [Route("api/Login")]
+    [Route("[controller]")]
     [ApiController]
     public class LoginController : ControllerBase
     {
@@ -15,8 +15,7 @@ namespace HangmanGameAPI.Controllers
             _context = context;
         }
 
-        // GET: api/Login?username=&password=
-        [HttpGet]
+        [HttpGet(Name = nameof(Login))]
         public ActionResult<User> Login(string username, string password)
         {
             User? user = _context.Users.Where(user => user.Username == username && user.Password == password)

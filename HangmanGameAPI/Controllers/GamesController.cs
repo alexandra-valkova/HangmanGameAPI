@@ -1,12 +1,12 @@
-﻿using HangmanGameAPI.Data;
-using HangmanGameAPI.Models;
+﻿using HangmanGameAPI.Entities;
+using HangmanGameAPI.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace HangmanGameAPI.Controllers
 {
-    [Route("api/Game")]
     [ApiController]
+    [Route("[controller]")]
     public class GamesController : ControllerBase
     {
         private readonly HangmanGameContext _context;
@@ -16,15 +16,13 @@ namespace HangmanGameAPI.Controllers
             _context = context;
         }
 
-        // GET: api/Games
-        [HttpGet]
+        [HttpGet(Name = nameof(GetGames))]
         public async Task<ActionResult<IEnumerable<Game>>> GetGames()
         {
             return await _context.Games.ToListAsync();
         }
 
-        // GET: api/Games/5
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}", Name = nameof(GetGame))]
         public async Task<ActionResult<Game>> GetGame(int id)
         {
             Game? game = await _context.Games.FindAsync(id);
@@ -37,9 +35,17 @@ namespace HangmanGameAPI.Controllers
             return game;
         }
 
-        // PUT: api/Games/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutGame(int id, Game game)
+        [HttpPost(Name = nameof(CreateGame))]
+        public async Task<ActionResult<Game>> CreateGame(Game game)
+        {
+            _context.Games.Add(game);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetGame", new { id = game.Id }, game);
+        }
+
+        [HttpPut("{id:int}", Name = nameof(UpdateGame))]
+        public async Task<IActionResult> UpdateGame(int id, Game game)
         {
             if (id != game.Id)
             {
@@ -67,18 +73,7 @@ namespace HangmanGameAPI.Controllers
             return NoContent();
         }
 
-        // POST: api/Games
-        [HttpPost]
-        public async Task<ActionResult<Game>> PostGame(Game game)
-        {
-            _context.Games.Add(game);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetGame", new { id = game.Id }, game);
-        }
-
-        // DELETE: api/Games/5
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}", Name = nameof(DeleteGame))]
         public async Task<ActionResult<Game>> DeleteGame(int id)
         {
             Game? game = await _context.Games.FindAsync(id);

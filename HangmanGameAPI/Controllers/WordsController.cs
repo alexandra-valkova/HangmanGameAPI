@@ -1,12 +1,12 @@
-﻿using HangmanGameAPI.Data;
-using HangmanGameAPI.Models;
+﻿using HangmanGameAPI.Entities;
+using HangmanGameAPI.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace HangmanGameAPI.Controllers
 {
-    [Route("api/Word")]
     [ApiController]
+    [Route("[controller]")]
     public class WordsController : ControllerBase
     {
         private readonly HangmanGameContext _context;
@@ -16,15 +16,13 @@ namespace HangmanGameAPI.Controllers
             _context = context;
         }
 
-        // GET: api/Words
-        [HttpGet]
+        [HttpGet(Name = nameof(GetWords))]
         public async Task<ActionResult<IEnumerable<Word>>> GetWords()
         {
             return await _context.Words.ToListAsync();
         }
 
-        // GET: api/Words/5
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}", Name = nameof(GetWord))]
         public async Task<ActionResult<Word>> GetWord(int id)
         {
             Word? word = await _context.Words.FindAsync(id);
@@ -37,9 +35,17 @@ namespace HangmanGameAPI.Controllers
             return word;
         }
 
-        // PUT: api/Words/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutWord(int id, Word word)
+        [HttpPost(Name = nameof(CreateWord))]
+        public async Task<ActionResult<Word>> CreateWord(Word word)
+        {
+            _context.Words.Add(word);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetWord", new { id = word.Id }, word);
+        }
+
+        [HttpPut("{id:int}", Name = nameof(UpdateWord))]
+        public async Task<IActionResult> UpdateWord(int id, Word word)
         {
             if (id != word.Id)
             {
@@ -67,18 +73,7 @@ namespace HangmanGameAPI.Controllers
             return NoContent();
         }
 
-        // POST: api/Words
-        [HttpPost]
-        public async Task<ActionResult<Word>> PostWord(Word word)
-        {
-            _context.Words.Add(word);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetWord", new { id = word.Id }, word);
-        }
-
-        // DELETE: api/Words/5
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}", Name = nameof(DeleteWord))]
         public async Task<ActionResult<Word>> DeleteWord(int id)
         {
             Word? word = await _context.Words.FindAsync(id);
